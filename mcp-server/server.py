@@ -10,6 +10,9 @@ Key concepts demonstrated:
 - Docstrings: MCP uses these as tool descriptions for the AI
 """
 
+# server.py — The simplest MCP server possible
+
+from mcp.server.fastmcp import FastMCP
 import uuid
 import json
 import base64
@@ -17,15 +20,30 @@ import hashlib
 import re
 from datetime import datetime, timezone
 
-from mcp.server.fastmcp import FastMCP
-
-# ============================================================
-# INITIALIZE THE SERVER
-# ============================================================
-# This is like: const app = express()  in Node.js
-# The name "DevToolkit" appears in the client when connecting
+# Step A: Create the server instance
+# This is like: const app = express()
+# The name "DevToolkit" shows up when clients connect
 mcp = FastMCP("DevToolkit")
 
+
+# Step B: Register a tool
+# @mcp.tool() is like @app.post("/greet") in FastAPI
+
+# ============================================================
+# TOOL 1: Generate UUID
+# ============================================================
+# @mcp.tool() is like @app.post("/generate-uuid") in FastAPI
+# The docstring becomes the tool description that the AI reads
+# The AI uses this description to decide WHEN to call this tool
+
+@mcp.tool()
+def greet(name: str) -> str:
+    """Greet someone by name.
+
+    Args:
+        name: The person's name to greet
+    """
+    return f"Hello, {name}! Welcome to MCP! 🎉"
 
 # ============================================================
 # TOOL 1: Generate UUID
@@ -42,7 +60,6 @@ def generate_uuid() -> str:
     for example for database records, session tokens, or tracking IDs.
     """
     return str(uuid.uuid4())
-
 
 # ============================================================
 # TOOL 2: Format/Validate JSON
@@ -67,7 +84,6 @@ def format_json(json_string: str) -> str:
     except json.JSONDecodeError as e:
         return f"❌ Invalid JSON: {str(e)}"
 
-
 # ============================================================
 # TOOL 3: Base64 Encode
 # ============================================================
@@ -85,7 +101,6 @@ def base64_encode(text: str) -> str:
     encoded = base64.b64encode(text.encode("utf-8")).decode("utf-8")
     return f"Encoded: {encoded}"
 
-
 # ============================================================
 # TOOL 4: Base64 Decode
 # ============================================================
@@ -102,7 +117,6 @@ def base64_decode(encoded_text: str) -> str:
         return f"Decoded: {decoded}"
     except Exception as e:
         return f"❌ Invalid Base64: {str(e)}"
-
 
 # ============================================================
 # TOOL 5: Hash Text
@@ -135,7 +149,6 @@ def hash_text(text: str, algorithm: str = "sha256") -> str:
     hash_value = algorithms[algo](text.encode("utf-8")).hexdigest()
     return f"Algorithm: {algo}\nHash: {hash_value}"
 
-
 # ============================================================
 # TOOL 6: Word Count / Text Stats
 # ============================================================
@@ -163,7 +176,6 @@ def word_count(text: str) -> str:
 - Lines: {lines}
 - Sentences: {max(sentences, 0)}"""
 
-
 # ============================================================
 # TOOL 7: Timestamp Converter
 # ============================================================
@@ -172,8 +184,8 @@ def word_count(text: str) -> str:
 def timestamp_convert(value: str) -> str:
     """Convert between Unix timestamps and human-readable dates.
 
-    - Pass a number (like "1709654400") to convert timestamp → date
-    - Pass a date string (like "2024-03-05") to convert date → timestamp
+    - Pass a number (like "1709654400") to convert timestamp to date
+    - Pass a date string (like "2024-03-05") to convert date to timestamp
 
     Args:
         value: Unix timestamp (number) or date string (YYYY-MM-DD or YYYY-MM-DD HH:MM:SS)
@@ -199,7 +211,6 @@ def timestamp_convert(value: str) -> str:
             continue
 
     return f"❌ Could not parse: {value}. Use Unix timestamp or YYYY-MM-DD format."
-
 
 # ============================================================
 # TOOL 8: Regex Tester
@@ -227,6 +238,7 @@ def regex_test(pattern: str, text: str) -> str:
     except re.error as e:
         return f"❌ Invalid regex: {str(e)}"
 
+# Step C: Start the server
 
 # ============================================================
 # RUN THE SERVER
