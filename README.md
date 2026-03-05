@@ -22,10 +22,12 @@ This repo contains hands-on AI engineering projects built while learning to crea
 ai-dev-toolkit/
 ├── mcp-server/              # MCP Server — Developer Toolkit
 │   ├── server.py            # 8 developer tools exposed via MCP
+│   ├── TUTORIAL.md          # Step-by-step build tutorial
 │   └── MCP_LEARNING_NOTES.md # Detailed learning notes
 ├── agent/                   # AI Agent (coming soon)
 │   └── ...
 ├── docs/                    # Architecture docs & diagrams
+├── AI_ENGINEER_ROADMAP.md   # Learning roadmap
 ├── requirements.txt
 ├── .gitignore
 └── README.md
@@ -54,7 +56,7 @@ A Model Context Protocol (MCP) server that provides 8 useful developer tools to 
 
 ```bash
 # Clone the repo
-git clone https://github.com/YOUR_USERNAME/ai-dev-toolkit.git
+git clone https://github.com/ravirajput10/ai-dev-toolkit.git
 cd ai-dev-toolkit
 
 # Create virtual environment
