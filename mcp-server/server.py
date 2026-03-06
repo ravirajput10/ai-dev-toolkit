@@ -26,6 +26,9 @@ from datetime import datetime, timezone
 import platform  
 import os
 
+# Prompts
+from mcp.server.fastmcp.prompts import base  # Needed for prompt messages
+
 # Step A: Create the server instance
 # This is like: const app = express()
 # The name "DevToolkit" shows up when clients connect
@@ -333,6 +336,87 @@ def list_files() -> str:
         return f"📁 Files in {target_dir}:\n" + "\n".join(files)
     except Exception as e:
         return f"❌ Error listing directory: {str(e)}"
+
+# ============================================================
+# PROMPT 1: Code Review Template
+# ============================================================
+# Prompts return a list of messages (like a pre-built chat conversation)
+# The AI client shows these to the user as a starting point
+
+# Prompts return a template string that helps the user/AI
+# start a specific task. Think of it like a pre-built request
+
+@mcp.prompt()
+def code_review(code: str, language: str = "python") -> str:
+    """Generate a thorough code review prompt.
+
+    Args:
+        code: The code to review
+        language: Programming language (default: python)
+    """
+    return f"""Please review the following {language} code thoroughly.
+
+Check for:
+1. 🐛 Bugs and logic errors
+2. 🔒 Security vulnerabilities
+3. ⚡ Performance issues
+4. 📖 Code readability and naming
+5. 🏗️ Architecture and design patterns
+6. ✅ Edge cases and error handling
+
+Code to review:
+```{language}
+{code}
+```
+
+Provide detailed feedback and suggestions for improvement."""
+
+### Prompt 2: Explain Code
+
+@mcp.prompt()
+def explain_code(code: str, audience: str = "intermediate") -> str:
+    """Generate a prompt to explain code clearly.
+
+    Args:
+        code: The code to explain
+        audience: Target audience level - beginner, intermediate, or expert
+    """
+    return f"""Explain the following code for a {audience}-level developer.
+
+Break down:
+1. What the code does (high-level purpose)
+2. How it works (step by step)
+3. Key concepts used
+4. Any important patterns or techniques
+
+Code:
+{code}
+
+Use simple language and analogies where helpful."""
+
+# Prompt 3: Debug Helper Template
+
+@mcp.prompt()
+def debug_error(error_message: str, code: str = "") -> str:
+    """Generate a debugging prompt for an error.
+
+    Args:
+        error_message: The error message or traceback
+        code: The code that caused the error (optional)
+    """
+    code_section = f"\n\nCode that caused the error:\n```\n{code}\n```" if code else ""
+
+    return f"""I'm getting the following error and need help debugging it.
+
+Error:
+{error_message}
+{code_section}
+
+Please:
+1. Explain what this error means
+2. Identify the likely cause
+3. Provide the corrected code
+4. Explain how to prevent this in the future"""
 
 # Step C: Start the server
 
