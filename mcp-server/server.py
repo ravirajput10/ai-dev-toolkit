@@ -22,6 +22,18 @@ import hashlib
 import re
 from datetime import datetime, timezone
 import httpx
+# import logging
+# import sys
+
+# Logging setup (uncomment to enable debug logging to file)
+# logging.basicConfig(
+#     level=logging.DEBUG,
+#     format="%(asctime)s [%(levelname)s] %(message)s",
+#     datefmt="%H:%M:%S",
+#     filename="debug.log",
+#     filemode="w"
+# )
+# logger = logging.getLogger("DevToolkit")
 
 # Resources
 import platform  
@@ -279,6 +291,10 @@ async def search_github(query: str, max_results: int = 5) -> str:
             response.raise_for_status()
             data = response.json()
 
+            # Log the raw API response to terminal (uncomment to enable)
+            # logger.debug(f"GitHub API Status: {response.status_code}")
+            # logger.debug(f"GitHub API Response: {json.dumps(data, indent=2)[:1000]}")
+
             if data["total_count"] == 0:
                 return f"🔍 No repositories found for: {query}"
 
@@ -330,6 +346,10 @@ async def get_weather(city: str) -> str:
             )
             response.raise_for_status()
             data = response.json()
+
+            # Log the raw API response (uncomment to enable)
+            # logger.debug(f"Weather API Status: {response.status_code}")
+            # logger.debug(f"Weather API Response: {json.dumps(data, indent=2)[:1000]}")
 
             current = data["current_condition"][0]
             location = data["nearest_area"][0]
@@ -385,6 +405,10 @@ async def fetch_url(url: str) -> str:
                 follow_redirects=True
             )
             response.raise_for_status()
+
+            # Log the response (uncomment to enable)
+            # logger.debug(f"URL Fetch Status: {response.status_code}")
+            # logger.debug(f"URL Response: {response.text[:500]}")
 
             content_type = response.headers.get("content-type", "")
             content = response.text[:2000]  # Limit to 2000 chars
