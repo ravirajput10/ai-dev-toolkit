@@ -33,3 +33,6 @@ Thumbs.db
 # Logs
 *.log
 debug.log
+
+# Database files
+*.db
