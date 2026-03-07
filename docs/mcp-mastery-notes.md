@@ -610,10 +610,15 @@ def list_files(directory: str) -> str:
 Run your MCP server as a web service that anyone can connect to:
 
 ```python
-# Just change one line:
+# Configure host/port on settings, then run
+mcp.settings.host = "0.0.0.0"   # Allow network access
+mcp.settings.port = 8000        # Choose port
+
 if __name__ == "__main__":
-    mcp.run(transport="sse", host="0.0.0.0", port=8000)
+    mcp.run(transport="sse")
 ```
+
+> **Note:** `host` and `port` are set on `mcp.settings`, NOT passed as args to `mcp.run()`. This is a common gotcha!
 
 **Client config for SSE:**
 ```json

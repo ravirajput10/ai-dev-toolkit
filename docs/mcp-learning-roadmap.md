@@ -24,7 +24,7 @@ After building the DevToolkit MCP server, you already know:
 
 | Topic | Status | Where You Learned It |
 |---|---|---|
-| Tools (functions AI can call) | ✅ Done | `server.py` — 8 tools built |
+| Tools (functions AI can call) | ✅ Done | `tools/dev_tools.py` — 9 tools built |
 | Type hints + docstrings | ✅ Done | Every tool uses them |
 | stdio transport | ✅ Done | `mcp.run(transport="stdio")` |
 | MCP Inspector | ✅ Done | `mcp dev server.py` |
@@ -32,7 +32,7 @@ After building the DevToolkit MCP server, you already know:
 
 ---
 
-## Phase 2 — Resources & Prompts (Next Step)
+## Phase 2 — Resources & Prompts ✅ (Done)
 
 > Tools let AI *do things*. Resources let AI *read things*. Prompts give AI *templates*.
 
@@ -82,7 +82,7 @@ def code_review(code: str, language: str) -> str:
 
 ---
 
-## Phase 3 — External APIs & Async Tools
+## Phase 3 — External APIs & Async Tools ✅ (Done)
 
 > Real-world MCP servers connect to external services.
 
@@ -123,7 +123,7 @@ async def search_github(query: str) -> str:
 
 ---
 
-## Phase 4 — Database-Connected MCP Servers
+## Phase 4 — Database-Connected MCP Servers ✅ (Done)
 
 > Give AI the ability to query and manage data.
 
@@ -144,24 +144,26 @@ This is a mini CRUD app exposed via MCP — combines your backend skills with MC
 
 ---
 
-## Phase 5 — SSE Transport & Remote Servers
+## Phase 5 — SSE Transport & Remote Servers ✅ (Done)
 
 > Run MCP servers remotely, not just locally.
 
 | Topic | Priority |
 |---|---|
-| SSE (Server-Sent Events) transport | ✅ Must Learn |
-| Running MCP over HTTP | ✅ Must Learn |
+| SSE (Server-Sent Events) transport | ✅ Done |
+| Running MCP over HTTP | ✅ Done |
 | Authentication for remote MCP | ✅ Must Learn |
 | Deploying MCP server (Docker) | 🟡 Good to Know |
 
-**Code change — just one line:**
+**Code — host/port are on `mcp.settings`, not `mcp.run()`:**
 ```python
-# Local (what we use now)
+# Local (stdio)
 mcp.run(transport="stdio")
 
-# Remote (accessible over HTTP)
-mcp.run(transport="sse", host="0.0.0.0", port=8000)
+# Remote (SSE) — configure host/port on settings
+mcp.settings.host = "0.0.0.0"
+mcp.settings.port = 8000
+mcp.run(transport="sse")
 ```
 
 **Project idea:** Deploy your DevToolkit MCP server to a cloud service, connect from anywhere.
@@ -197,14 +199,14 @@ mcp.run(transport="sse", host="0.0.0.0", port=8000)
 
 ## 🏗️ Project Progression
 
-| # | Project | Phase | Skills Practiced |
+| # | Project | Phase | Status |
 |---|---|---|---|
-| 1 | ✅ **DevToolkit** (done!) | Phase 1 | Tools, types, docstrings, stdio |
-| 2 | **System Info Server** | Phase 2 | Resources, dynamic data |
-| 3 | **GitHub/API Server** | Phase 3 | Async, external APIs, env vars |
-| 4 | **Notes Manager** | Phase 4 | Database, CRUD, read/write safety |
-| 5 | **Remote DevToolkit** | Phase 5 | SSE transport, deployment |
-| 6 | **AI Agent + MCP** | Phase 6-7 | Agent calls MCP tools, production patterns |
+| 1 | **DevToolkit** | Phase 1 | ✅ Done — `tools/dev_tools.py` |
+| 2 | **System Info + Prompts** | Phase 2 | ✅ Done — `resources/`, `prompts/` |
+| 3 | **GitHub/API Tools** | Phase 3 | ✅ Done — `tools/api_tools.py` |
+| 4 | **Notes Manager (SQLite)** | Phase 4 | ✅ Done — `tools/db_tools.py`, `db/` |
+| 5 | **Remote SSE Server** | Phase 5 | ✅ Done — `server_sse.py` |
+| 6 | **AI Agent + MCP** | Phase 6-7 | ⏳ Next |
 
 ---
 

@@ -4,6 +4,9 @@
 > **Time:** ~45 minutes
 > **Prerequisites:** Python 3.10+ installed
 
+> [!NOTE]
+> This tutorial teaches you to build everything in a single `server.py`. After Phase 4, the code was **refactored into a modular structure** with separate folders for `tools/`, `resources/`, `prompts/`, and `db/`. See `server.py` for the current entry point.
+
 ---
 
 ## 🧠 Before We Start — What is MCP?

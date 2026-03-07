@@ -49,8 +49,8 @@ Runs the MCP server over HTTP instead of stdio.
 This allows remote clients to connect over the network.
 
 Usage:
-    python server_sse.py                          # Default: port 8000
-    python server_sse.py --host 0.0.0.0 --port 9000  # Custom host/port
+    python server_sse.py                              # Default: localhost:8000
+    python server_sse.py --host 0.0.0.0 --port 9000   # Custom host/port
 """
 
 import sys
@@ -65,20 +65,20 @@ from db.database import init_db
 # Initialize database
 init_db()
 
-# Parse command line arguments for host and port
-host = "127.0.0.1"  # Default: localhost only
-port = 8000          # Default port
-
+# Parse command line arguments for custom host and port
+# host/port live on mcp.settings (not on mcp.run())
 for i, arg in enumerate(sys.argv[1:], 1):
     if arg == "--host" and i < len(sys.argv) - 1:
-        host = sys.argv[i + 1]
+        mcp.settings.host = sys.argv[i + 1]
     elif arg == "--port" and i < len(sys.argv) - 1:
-        port = int(sys.argv[i + 1])
+        mcp.settings.port = int(sys.argv[i + 1])
 
 if __name__ == "__main__":
+    host = mcp.settings.host
+    port = mcp.settings.port
     print(f"🚀 Starting MCP SSE server on http://{host}:{port}/sse")
     print(f"   Press Ctrl+C to stop")
-    mcp.run(transport="sse", host=host, port=port)
+    mcp.run(transport="sse")
 ```
 
 ### Key Differences from `server.py`
@@ -87,16 +87,20 @@ if __name__ == "__main__":
 # server.py (local)
 mcp.run(transport="stdio")
 
-# server_sse.py (remote)
-mcp.run(transport="sse", host="127.0.0.1", port=8000)
+# server_sse.py (remote) — host/port live on mcp.settings
+mcp.settings.host = "127.0.0.1"  # or "0.0.0.0" for network access
+mcp.settings.port = 8000
+mcp.run(transport="sse")
 ```
 
-| Parameter | What It Does |
+| Setting | What It Does |
 |---|---|
 | `transport="sse"` | Use HTTP-based SSE instead of stdin/stdout |
-| `host="127.0.0.1"` | Only accept local connections |
-| `host="0.0.0.0"` | Accept connections from any IP (for network access) |
-| `port=8000` | HTTP port to listen on |
+| `mcp.settings.host = "127.0.0.1"` | Only accept local connections |
+| `mcp.settings.host = "0.0.0.0"` | Accept connections from any IP (for network access) |
+| `mcp.settings.port = 8000` | HTTP port to listen on |
+
+> **⚠️ Important:** `host` and `port` go on `mcp.settings`, NOT as args to `mcp.run()`. This is a common gotcha!
 
 ---
 
@@ -235,7 +239,9 @@ mcp.run(transport="stdio")
 # Client config: {"command": "python.exe", "args": ["server.py"]}
 
 # REMOTE (SSE) — you start the server, clients connect
-mcp.run(transport="sse", host="0.0.0.0", port=8000)
+mcp.settings.host = "0.0.0.0"   # host/port go on settings
+mcp.settings.port = 8000
+mcp.run(transport="sse")
 # Client config: {"url": "http://your-server:8000/sse"}
 ```
 
@@ -257,7 +263,7 @@ mcp.run(transport="sse", host="0.0.0.0", port=8000)
 
 | Express | MCP SSE |
 |---|---|
-| `app.listen(8000)` | `mcp.run(transport="sse", port=8000)` |
+| `app.listen(8000)` | `mcp.settings.port = 8000; mcp.run(transport="sse")` |
 | `app.get('/sse', handler)` | Auto-created by FastMCP |
 | `app.post('/messages', handler)` | Auto-created by FastMCP |
 | Client visits `http://localhost:8000` | Client connects to `http://localhost:8000/sse` |
