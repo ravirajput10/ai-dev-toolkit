@@ -25,6 +25,7 @@ from app import mcp
 from tools import dev_tools      # 9 sync tools (Phase 1)
 from tools import api_tools      # 3 async tools (Phase 3)
 from tools import db_tools       # 4 database tools (Phase 4)
+from tools import advanced_tools # 3 advanced tools (Phase 6)
 from resources import system_resources  # 6 resources (Phase 2)
 from prompts import code_prompts       # 3 prompts (Phase 2)
 

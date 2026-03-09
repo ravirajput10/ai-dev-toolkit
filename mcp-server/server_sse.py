@@ -18,6 +18,7 @@ from app import mcp
 
 # Import all modules — registers tools/resources/prompts
 from tools import dev_tools, api_tools, db_tools
+from tools import advanced_tools  # 3 advanced tools (Phase 6)
 from resources import system_resources
 from prompts import code_prompts
 from db.database import init_db
