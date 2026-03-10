@@ -34,7 +34,7 @@ async def system_health_check(ctx: Context) -> str:
 
     # Step 1: Get system info
     await ctx.info("Checking system information...")
-    await ctx.report_progress(0.2, "Reading system info")
+    await ctx.report_progress(1, 5)
     try:
         sys_info = await ctx.read_resource("system://info")
         results.append(f"✅ System Info: Available")
@@ -43,7 +43,7 @@ async def system_health_check(ctx: Context) -> str:
 
     # Step 2: Check environment
     await ctx.info("Checking environment variables...")
-    await ctx.report_progress(0.4, "Reading environment")
+    await ctx.report_progress(2, 5)
     try:
         env_data = await ctx.read_resource("system://env")
         results.append(f"✅ Environment: Available")
@@ -52,7 +52,7 @@ async def system_health_check(ctx: Context) -> str:
 
     # Step 3: Check packages
     await ctx.info("Checking installed packages...")
-    await ctx.report_progress(0.6, "Reading packages")
+    await ctx.report_progress(3, 5)
     try:
         packages = await ctx.read_resource("system://packages")
         results.append(f"✅ Packages: Available")
@@ -61,7 +61,7 @@ async def system_health_check(ctx: Context) -> str:
 
     # Step 4: Check database
     await ctx.info("Checking database...")
-    await ctx.report_progress(0.8, "Testing database")
+    await ctx.report_progress(4, 5)
     try:
         from db.database import get_connection
         conn = get_connection()
@@ -74,7 +74,7 @@ async def system_health_check(ctx: Context) -> str:
         results.append(f"❌ Database: {str(e)}")
 
     # Done
-    await ctx.report_progress(1.0, "Health check complete")
+    await ctx.report_progress(5, 5)
     await ctx.info("Health check finished!")
 
     return "🏥 System Health Report\n" + "=" * 30 + "\n" + "\n".join(results)
@@ -176,8 +176,8 @@ async def bulk_create_notes(notes_json: str, ctx: Context) -> str:
             await ctx.warning(f"Skipping note {i+1}: missing title or content")
             continue
 
-        progress = (i + 1) / len(notes)
-        await ctx.report_progress(progress, f"Creating note {i+1}/{len(notes)}")
+        await ctx.info(f"Creating note {i+1}/{len(notes)}")
+        await ctx.report_progress(i + 1, len(notes))
 
         try:
             conn = get_connection()
