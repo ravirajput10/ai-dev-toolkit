@@ -10,13 +10,16 @@ Structure:
 │   ├── dev_tools.py            → Phase 1: greet, uuid, json, base64, hash, etc.
 │   ├── api_tools.py            → Phase 3: GitHub search, weather, URL fetch
 │   ├── db_tools.py             → Phase 4: Notes CRUD (create, list, search, delete)
-│   └── advanced_tools.py       → Phase 6: System health check, smart note search   
+│   └── advanced_tools.py       → Phase 6: System health check, smart note search
 ├── resources/
 │   └── system_resources.py     → Phase 2: system info, env, packages, etc.
 ├── prompts/
 │   └── code_prompts.py         → Phase 2: code review, explain code, debug error
-└── db/
-    └── database.py             → Database setup and connection helper
+├── db/
+│   └── database.py             → Database setup and connection helper
+├── validators.py               → Phase 7: Input validation and security
+└── tests/
+    └── test_validators.py      → Phase 7: 37 unit tests
 """
 
 # Import the shared MCP instance

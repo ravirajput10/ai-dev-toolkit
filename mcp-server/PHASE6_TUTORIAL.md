@@ -46,8 +46,8 @@ async def my_tool(query: str, ctx: Context) -> str:
     # Log messages (visible to client)
     await ctx.info("Starting to process...")
 
-    # Report progress
-    await ctx.report_progress(0.5, "Halfway done")
+    # Report progress (progress, total)
+    await ctx.report_progress(1, 2)  # Step 1 of 2
 
     # Read a resource from within this tool
     data = await ctx.read_resource("system://info")
@@ -104,7 +104,7 @@ async def system_health_check(ctx: Context) -> str:
 
     # Step 1: Get system info
     await ctx.info("Checking system information...")
-    await ctx.report_progress(0.2, "Reading system info")
+    await ctx.report_progress(1, 5)
     try:
         sys_info = await ctx.read_resource("system://info")
         results.append(f"✅ System Info: Available")
@@ -113,7 +113,7 @@ async def system_health_check(ctx: Context) -> str:
 
     # Step 2: Check environment
     await ctx.info("Checking environment variables...")
-    await ctx.report_progress(0.4, "Reading environment")
+    await ctx.report_progress(2, 5)
     try:
         env_data = await ctx.read_resource("system://env")
         results.append(f"✅ Environment: Available")
@@ -122,7 +122,7 @@ async def system_health_check(ctx: Context) -> str:
 
     # Step 3: Check packages
     await ctx.info("Checking installed packages...")
-    await ctx.report_progress(0.6, "Reading packages")
+    await ctx.report_progress(3, 5)
     try:
         packages = await ctx.read_resource("system://packages")
         results.append(f"✅ Packages: Available")
@@ -131,7 +131,7 @@ async def system_health_check(ctx: Context) -> str:
 
     # Step 4: Check database
     await ctx.info("Checking database...")
-    await ctx.report_progress(0.8, "Testing database")
+    await ctx.report_progress(4, 5)
     try:
         from db.database import get_connection
         conn = get_connection()
@@ -144,7 +144,7 @@ async def system_health_check(ctx: Context) -> str:
         results.append(f"❌ Database: {str(e)}")
 
     # Done
-    await ctx.report_progress(1.0, "Health check complete")
+    await ctx.report_progress(5, 5)
     await ctx.info("Health check finished!")
 
     return "🏥 System Health Report\n" + "=" * 30 + "\n" + "\n".join(results)
@@ -245,8 +245,8 @@ async def bulk_create_notes(notes_json: str, ctx: Context) -> str:
             await ctx.warning(f"Skipping note {i+1}: missing title or content")
             continue
 
-        progress = (i + 1) / len(notes)
-        await ctx.report_progress(progress, f"Creating note {i+1}/{len(notes)}")
+        await ctx.info(f"Creating note {i+1}/{len(notes)}")
+        await ctx.report_progress(i + 1, len(notes))
 
         try:
             conn = get_connection()
@@ -318,7 +318,7 @@ async def my_tool(param: str, ctx: Context) -> str:
     """Tool with context."""
     await ctx.info("Info message")               # 📝 Log info
     await ctx.warning("Warning message")         # ⚠️ Log warning
-    await ctx.report_progress(0.5, "Half done")  # 📊 Progress bar
+    await ctx.report_progress(1, 2)             # 📊 Progress: step 1 of 2
     data = await ctx.read_resource("uri://...")   # 📖 Read a resource
     return "result"
 ```
@@ -358,7 +358,7 @@ Resource X               ├── logs progress
 | Concept | Key Point |
 |---|---|
 | Context object | Hidden from AI, injected by MCP, must be last param |
-| Progress reporting | `report_progress(0.0-1.0, "message")` |
+| Progress reporting | `report_progress(current, total)` — both numbers |
 | Logging | `ctx.info()` and `ctx.warning()` — visible to client |
 | Resource reading | Tools can read resources via `ctx.read_resource()` |
 | Bulk operations | Use progress reporting for batch processing |

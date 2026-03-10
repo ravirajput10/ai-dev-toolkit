@@ -32,10 +32,11 @@
 │  │  ┌─────────────┐ ┌─────────────┐ ┌──────────────┐   │    │
 │  │  │base64_encode│ │base64_decode│ │  hash_text() │   │    │
 │  │  └─────────────┘ └─────────────┘ └──────────────┘   │    │
-│  │  ┌─────────────┐ ┌─────────────┐                    │    │
-│  │  │ word_count()│ │timestamp    │ ┌──────────────┐   │    │
-│  │  └─────────────┘ │_convert()   │ │ regex_test() │   │    │
-│  │                  └─────────────┘ └──────────────┘   │    │
+│  │  ┌─────────────┐ ┌─────────────┐ ┌──────────────┐   │    │
+│  │  │ word_count()│ │timestamp    │ │ regex_test() │   │    │
+│  │  └─────────────┘ │_convert()   │ └──────────────┘   │    │
+│  │                  └─────────────┘                    │    │
+│  │  + 10 more tools (API, DB, Advanced)                │    │
 │  └──────────────────────────────────────────────────────┘    │
 └──────────────────────────────────────────────────────────────┘
 ```
@@ -162,28 +163,37 @@ def hash_text(                     {
 
 ---
 
-## File Structure
-
 ```
 mcp-server/
-├── server.py              # All tools defined here (single-file for simplicity)
-├── TUTORIAL.md            # Step-by-step build guide
-├── MCP_LEARNING_NOTES.md  # Concept explanations & analogies
+├── app.py                 # Shared FastMCP instance
+├── server.py              # Entry point (stdio transport)
+├── server_sse.py          # Entry point (SSE/HTTP transport)
+├── validators.py          # Input validation & security (Phase 7)
+├── tools/
+│   ├── dev_tools.py       # 9 core tools (Phase 1)
+│   ├── api_tools.py       # 3 async API tools (Phase 3)
+│   ├── db_tools.py        # 4 database CRUD tools (Phase 4)
+│   └── advanced_tools.py  # 3 advanced tools (Phase 6)
+├── resources/
+│   └── system_resources.py # 6 resources (Phase 2)
+├── prompts/
+│   └── code_prompts.py    # 3 prompts (Phase 2)
+├── db/
+│   └── database.py        # SQLite setup & connection
+├── tests/
+│   └── test_validators.py # 37 unit tests (Phase 7)
 └── venv/                  # Python virtual environment (not in git)
 ```
 
-### Why Single File?
+### Modular Architecture
 
-For a utility toolkit, one file is the right choice:
-- Each tool is independent (no shared state)
-- Easy to read, easy to add new tools
-- No over-engineering for a simple server
+The server uses a modular structure where each module registers its
+tools/resources/prompts via decorators on a shared `mcp` instance:
 
-**When to split into multiple files:**
-- Tools share state or services (e.g., database connections)
-- Server has 20+ tools
-- Tools need async external API calls with shared clients
-- You add Resources or Prompts alongside Tools
+- `app.py` creates the shared `FastMCP` instance (like `const app = express()`)
+- Each module imports `mcp` from `app.py` and uses `@mcp.tool()` decorators
+- `server.py` imports all modules — decorators run on import, registering everything
+- Validators provide centralized input validation (Phase 7)
 
 ---
 
@@ -219,8 +229,9 @@ def my_new_tool(param1: str, param2: int = 10) -> str:
 | Decision | Choice | Rationale |
 |---|---|---|
 | Framework | FastMCP (not low-level SDK) | Simpler, decorator-based, less boilerplate |
-| Transport | stdio (not SSE) | Local server, no network needed |
-| Architecture | Single file | Tools are independent, keep it simple |
-| Error handling | Return error strings | Don't crash — AI can read errors and retry |
+| Transport | stdio + SSE | stdio for local, SSE for remote |
+| Architecture | Modular (separate files per phase) | Scalable, maintainable, clear separation |
+| Error handling | Return error strings + validation | Don't crash — AI can read errors and retry |
+| Input validation | Centralized `validators.py` | DRY, testable, like Express middleware |
 | Output format | Formatted strings with emojis | Human-readable, AI can parse it too |
-| No external APIs | All tools use Python stdlib | No API keys, no rate limits, works offline |
+| Database | SQLite | Built-in, serverless, good for learning |
