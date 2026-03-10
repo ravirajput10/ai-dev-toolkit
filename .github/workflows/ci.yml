@@ -1,0 +1,67 @@
+# ============================================================
+# GitHub Actions CI — Runs tests on every push & PR
+# ============================================================
+# This file lives at: .github/workflows/ci.yml
+# GitHub automatically detects it and runs the pipeline.
+#
+# Express analogy:
+#   package.json has "scripts": { "test": "jest" }
+#   CI runs "npm test" automatically on every push
+#   This does the same but for Python + unittest
+
+# ---- SECTION 1: When should this run? ----
+name: CI                     # Name shown in GitHub Actions tab
+
+on:                          # "on" = trigger events
+  push:                      # Run when code is pushed...
+    branches: [main]         # ...to the main branch only
+  pull_request:              # Also run on pull requests...
+    branches: [main]         # ...targeting main
+
+# ---- SECTION 2: What environment to run on? ----
+jobs:                        # A workflow has one or more jobs
+  test:                      # Job name: "test"
+    runs-on: ubuntu-latest   # Use a fresh Ubuntu VM (free on GitHub)
+                             # Like: "spin up a Linux server for me"
+
+    # ---- SECTION 3: Step-by-step instructions ----
+    steps:
+      # Step 1: Download your code into the VM
+      - name: Checkout code              # Human-readable step name
+        uses: actions/checkout@v4        # Official GitHub action to clone repo
+                                         # Like: git clone your-repo
+
+      # Step 2: Install Python
+      - name: Set up Python
+        uses: actions/setup-python@v5    # Official action to install Python
+        with:
+          python-version: "3.12"         # Specify Python version
+
+      # Step 3: Install your dependencies
+      - name: Install dependencies
+        working-directory: ./mcp-server  # cd into mcp-server first
+        run: |                           # Run shell commands (| = multi-line)
+          python -m pip install --upgrade pip
+          pip install mcp[cli] httpx     # Same as requirements.txt
+
+      # Step 4: Run the tests!
+      - name: Run unit tests
+        working-directory: ./mcp-server
+        run: python -m unittest tests.test_validators -v
+        # Runs all 37 tests
+        # If ANY test fails → the whole CI pipeline fails
+        # You'll see a red ❌ on your GitHub commit
+
+      # Step 5: Verify server loads correctly
+      - name: Verify server loads
+        working-directory: ./mcp-server
+        run: |
+          python -c "
+          from app import mcp
+          from tools import dev_tools, api_tools, db_tools, advanced_tools
+          from resources import system_resources
+          from prompts import code_prompts
+          from db.database import init_db
+          init_db()
+          print('✅ All 19 tools loaded successfully')
+          "
