@@ -39,11 +39,11 @@ jobs:                        # A workflow has one or more jobs
 
       # Step 3: Install your dependencies
       - name: Install dependencies
+        working-directory: ./mcp-server  # requirements.txt lives here
         run: |                           # Run shell commands (| = multi-line)
           python -m pip install --upgrade pip
           pip install -r requirements.txt  # Reads packages from file
           # ☝️ Always use requirements.txt, NOT hardcoded package names!
-          # Even if you have 50 packages, this one line handles all of them
 
       # Step 4: Run the tests!
       - name: Run unit tests

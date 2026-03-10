@@ -38,13 +38,7 @@ ai-dev-toolkit/
 │   │   └── database.py          # SQLite setup & connection
 │   ├── tests/
 │   │   └── test_validators.py   # 37 unit tests (Phase 7)
-│   ├── TUTORIAL.md              # Phase 1 build tutorial
-│   ├── PHASE2_TUTORIAL.md       # Resources & Prompts tutorial
-│   ├── PHASE3_TUTORIAL.md       # Async API tools tutorial
-│   ├── PHASE4_TUTORIAL.md       # Database tools tutorial
-│   ├── PHASE5_TUTORIAL.md       # SSE transport tutorial
-│   ├── PHASE6_TUTORIAL.md       # Advanced patterns tutorial
-│   └── PHASE7_TUTORIAL.md       # Production patterns tutorial
+│   └── requirements.txt         # Python dependencies
 ├── docs/
 │   ├── mcp-learning-roadmap.md  # Learning roadmap
 │   ├── mcp-mastery-notes.md     # Concept reference
