@@ -1,11 +1,20 @@
 """
-DB Tools — Phase 4 Tools
-==========================
+DB Tools — Phase 4 Tools (Production-hardened in Phase 7)
+===========================================================
 Database CRUD tools for the Notes Manager: create, list, search, delete notes.
+All inputs are validated before processing.
 """
 
 from app import mcp
 from db.database import get_connection
+from validators import (
+    validate_note_title,
+    validate_note_content,
+    validate_search_query,
+    validate_positive_int,
+    ValidationError,
+    sanitize_for_display,
+)
 
 
 # ============================================================
@@ -23,6 +32,10 @@ def create_note(title: str, content: str) -> str:
         content: Content/body of the note
     """
     try:
+        # Phase 7: Validate inputs BEFORE touching the database
+        title = validate_note_title(title)
+        content = validate_note_content(content)
+
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute(
@@ -33,6 +46,8 @@ def create_note(title: str, content: str) -> str:
         note_id = cursor.lastrowid
         conn.close()
         return f"✅ Note created successfully!\n📝 ID: {note_id}\n📌 Title: {title}"
+    except ValidationError as e:
+        return str(e)
     except Exception as e:
         return f"❌ Error creating note: {str(e)}"
 
@@ -49,6 +64,8 @@ def list_notes(limit: int = 10) -> str:
         limit: Maximum number of notes to return (default: 10)
     """
     try:
+        # Phase 7: Validate limit
+        limit = validate_positive_int(limit, "Limit", min_val=1, max_val=100)
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute(
@@ -63,13 +80,15 @@ def list_notes(limit: int = 10) -> str:
 
         result = f"📋 Notes ({len(notes)} found):\n\n"
         for note_id, title, content, created_at in notes:
-            preview = content[:100] + "..." if len(content) > 100 else content
+            preview = sanitize_for_display(content)
             result += f"━━━━━━━━━━━━━━━━━━━━\n"
             result += f"📝 ID: {note_id} | {created_at}\n"
             result += f"📌 {title}\n"
             result += f"   {preview}\n\n"
 
         return result
+    except ValidationError as e:
+        return str(e)
     except Exception as e:
         return f"❌ Error listing notes: {str(e)}"
 
@@ -86,6 +105,9 @@ def search_notes(query: str) -> str:
         query: Search term to look for in note titles and content
     """
     try:
+        # Phase 7: Validate search query
+        query = validate_search_query(query)
+
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute(
@@ -100,13 +122,15 @@ def search_notes(query: str) -> str:
 
         result = f"🔍 Search results for '{query}' ({len(notes)} found):\n\n"
         for note_id, title, content, created_at in notes:
-            preview = content[:100] + "..." if len(content) > 100 else content
+            preview = sanitize_for_display(content)
             result += f"━━━━━━━━━━━━━━━━━━━━\n"
             result += f"📝 ID: {note_id} | {created_at}\n"
             result += f"📌 {title}\n"
             result += f"   {preview}\n\n"
 
         return result
+    except ValidationError as e:
+        return str(e)
     except Exception as e:
         return f"❌ Error searching notes: {str(e)}"
 
